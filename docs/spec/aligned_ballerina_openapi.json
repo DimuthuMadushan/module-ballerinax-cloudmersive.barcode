@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "https://testapi.cloudmersive.com/barcode"
+            "url": "https://api.cloudmersive.com/barcode"
         }
     ],
     "security": [

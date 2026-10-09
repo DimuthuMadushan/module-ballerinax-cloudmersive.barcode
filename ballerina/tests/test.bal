@@ -38,19 +38,22 @@ function testLookupEanBarcode() returns error? {
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testScanBarcodeImage() returns error? {
     BarcodeScanResult response = check barcodeClient->scanBarcodeImage(sampleImage);
-    test:assertTrue(response?.successful is boolean);
+    test:assertEquals(response?.successful, true);
+    test:assertTrue(response?.rawText is string);
 }
 
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testScanBarcodeImageAdvanced() returns error? {
     BarcodeAdvancedScanResult response = check barcodeClient->scanBarcodeImageAdvanced(sampleImage);
-    test:assertTrue(response?.successful is boolean);
+    test:assertEquals(response?.successful, true);
+    test:assertTrue((response?.barcodeCount ?: 0) > 0);
 }
 
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testScanQrBarcodeImageAdvanced() returns error? {
     BarcodeScanQRAdvancedResult response = check barcodeClient->scanQrBarcodeImageAdvanced(sampleImage);
-    test:assertTrue(response?.successful is boolean);
+    test:assertEquals(response?.successful, true);
+    test:assertTrue((response?.barcodeCount ?: 0) > 0);
 }
 
 @test:Config {groups: ["mock_tests"]}
@@ -68,35 +71,48 @@ function testGetBatchJobStatus() returns error? {
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testGenerateQrCode() returns error? {
     byte[] response = check barcodeClient->generateQrCode("https://example.com");
-    test:assertTrue(response.length() > 0);
+    test:assertTrue(isPng(response));
 }
 
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testGenerateUpcABarcode() returns error? {
     byte[] response = check barcodeClient->generateUpcABarcode("614141000036", {width: 200, height: 100});
-    test:assertTrue(response.length() > 0);
+    test:assertTrue(isPng(response));
 }
 
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testGenerateUpcEBarcode() returns error? {
     byte[] response = check barcodeClient->generateUpcEBarcode("01234565");
-    test:assertTrue(response.length() > 0);
+    test:assertTrue(isPng(response));
 }
 
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testGenerateEan13Barcode() returns error? {
     byte[] response = check barcodeClient->generateEan13Barcode("5901234123457", {includeLabel: true});
-    test:assertTrue(response.length() > 0);
+    test:assertTrue(isPng(response));
 }
 
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testGenerateEan8Barcode() returns error? {
     byte[] response = check barcodeClient->generateEan8Barcode("96385074");
-    test:assertTrue(response.length() > 0);
+    test:assertTrue(isPng(response));
 }
 
 @test:Config {groups: ["live_tests", "mock_tests"]}
 function testGenerateCode128Barcode() returns error? {
     byte[] response = check barcodeClient->generateCode128Barcode("ABC-12345");
-    test:assertTrue(response.length() > 0);
+    test:assertTrue(isPng(response));
+}
+
+# Checks that the bytes form a PNG: the 8-byte signature followed eventually by the IEND trailer chunk.
+#
+# + content - The bytes to check
+# + return - `true` if the bytes start with the PNG signature and end with the IEND chunk
+isolated function isPng(byte[] content) returns boolean {
+    byte[] signature = [137, 80, 78, 71, 13, 10, 26, 10];
+    byte[] iend = [0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130];
+    int len = content.length();
+    return len >= signature.length() + iend.length()
+        && content.slice(0, signature.length()) == signature
+        && content.slice(len - iend.length()) == iend;
 }

@@ -5,7 +5,7 @@
     "title": "barcodeapi",
     "description": "Barcode APIs let you generate barcode images, and recognize values from images of barcodes."
   },
-  "host": "testapi.cloudmersive.com",
+  "host": "api.cloudmersive.com",
   "schemes": [
     "https"
   ],

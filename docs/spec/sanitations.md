@@ -52,9 +52,14 @@ These changes are done in order to improve the overall usability, and as workaro
 - **Reason**: Name the shared image upload body after its purpose.
 
 9. Collapse the double slash in the server URL (edit to the aligned spec; re-apply after a re-align)
-- **Original**: After the `/barcode` prefix is folded into the server, the aligned spec's server URL is `https://testapi.cloudmersive.com//barcode`.
-- **Updated**: `https://testapi.cloudmersive.com/barcode` in `docs/spec/aligned_ballerina_openapi.json`.
+- **Original**: After the `/barcode` prefix is folded into the server, the aligned spec's server URL is `https://api.cloudmersive.com//barcode`.
+- **Updated**: `https://api.cloudmersive.com/barcode` in `docs/spec/aligned_ballerina_openapi.json`.
 - **Reason**: The doubled slash is invalid in the generated default `serviceUrl`.
+
+10. Use the production host
+- **Original**: `host` was `testapi.cloudmersive.com`, Cloudmersive's test endpoint.
+- **Updated**: `api.cloudmersive.com`, so the client's default `serviceUrl` is `https://api.cloudmersive.com/barcode`.
+- **Reason**: The connector should target the production API by default.
 
 ## OpenAPI cli command
 
